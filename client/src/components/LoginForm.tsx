@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { LoginCredentials } from '../types/auth.types';
 import { useNavigate } from 'react-router-dom';
@@ -6,10 +6,29 @@ import { useNavigate } from 'react-router-dom';
 const LoginForm: React.FC = () => {
   const { login, error, isLoading } = useAuth();
   const navigate = useNavigate();
+  const [serverError, setServerError] = useState<string | null>(null);
   const [credentials, setCredentials] = useState<LoginCredentials>({
     email: '',
     password: '',
   });
+
+  // Check if server is running
+  useEffect(() => {
+    const checkServerStatus = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/health');
+        if (!response.ok) {
+          setServerError('Server is not responding. Please try again later.');
+        } else {
+          setServerError(null);
+        }
+      } catch (error) {
+        setServerError('Cannot connect to server. Please make sure the server is running.');
+      }
+    };
+
+    checkServerStatus();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -58,6 +77,7 @@ const LoginForm: React.FC = () => {
           />
         </div>
         {error && <div className="error-message">{error}</div>}
+        {serverError && <div className="error-message">{serverError}</div>}
         <button type="submit" disabled={isLoading}>
           {isLoading ? 'Logging in...' : 'Login'}
         </button>

@@ -1,7 +1,6 @@
 import React from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import Sidebar from './Sidebar';
-import Header from './Header';
+import TopNavbar from './TopNavbar';
 import '../../styles/dashboard.css';
 
 interface DashboardLayoutProps {
@@ -13,9 +12,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
 
   return (
     <div className="dashboard-container">
-      <Sidebar />
+      <TopNavbar user={user} />
       <div className="dashboard-content">
-        <Header user={user} />
         <main className="dashboard-main">
           {children}
         </main>

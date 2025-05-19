@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { RegisterCredentials } from '../types/auth.types';
 import { useNavigate } from 'react-router-dom';
@@ -6,11 +6,30 @@ import { useNavigate } from 'react-router-dom';
 const RegisterForm: React.FC = () => {
   const { register, error, isLoading } = useAuth();
   const navigate = useNavigate();
+  const [serverError, setServerError] = useState<string | null>(null);
   const [credentials, setCredentials] = useState<RegisterCredentials>({
     name: '',
     email: '',
     password: '',
   });
+
+  // Check if server is running
+  useEffect(() => {
+    const checkServerStatus = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/health');
+        if (!response.ok) {
+          setServerError('Server is not responding. Please try again later.');
+        } else {
+          setServerError(null);
+        }
+      } catch (error) {
+        setServerError('Cannot connect to server. Please make sure the server is running.');
+      }
+    };
+
+    checkServerStatus();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -70,9 +89,14 @@ const RegisterForm: React.FC = () => {
             value={credentials.password}
             onChange={handleChange}
             required
+            minLength={6}
           />
+          <small className="password-requirements">
+            Password must be at least 6 characters long and should include uppercase, lowercase, numbers, and special characters.
+          </small>
         </div>
         {error && <div className="error-message">{error}</div>}
+        {serverError && <div className="error-message">{serverError}</div>}
         <button type="submit" disabled={isLoading}>
           {isLoading ? 'Registering...' : 'Register'}
         </button>
