@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { RegisterCredentials } from '../types/auth.types';
+import { useNavigate } from 'react-router-dom';
 
 const RegisterForm: React.FC = () => {
   const { register, error, isLoading } = useAuth();
+  const navigate = useNavigate();
   const [credentials, setCredentials] = useState<RegisterCredentials>({
     name: '',
     email: '',
@@ -25,7 +27,8 @@ const RegisterForm: React.FC = () => {
       console.log('Calling register function...');
       await register(credentials);
       console.log('Registration successful!');
-      // Redirect will be handled by the protected route
+      // Navigate to dashboard after successful registration
+      navigate('/dashboard');
     } catch (error) {
       // Error is handled in the auth context
       console.error('Registration failed:', error);

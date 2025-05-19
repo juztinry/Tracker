@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { LoginCredentials } from '../types/auth.types';
+import { useNavigate } from 'react-router-dom';
 
 const LoginForm: React.FC = () => {
   const { login, error, isLoading } = useAuth();
+  const navigate = useNavigate();
   const [credentials, setCredentials] = useState<LoginCredentials>({
     email: '',
     password: '',
@@ -21,7 +23,8 @@ const LoginForm: React.FC = () => {
     e.preventDefault();
     try {
       await login(credentials);
-      // Redirect will be handled by the protected route
+      // Navigate to dashboard after successful login
+      navigate('/dashboard');
     } catch (error) {
       // Error is handled in the auth context
       console.error('Login failed:', error);
